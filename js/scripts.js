@@ -15,7 +15,8 @@ let pokemonList = [
         types: ["electric"]
     }
 ];
-for (let i = 0; i < pokemonList.length; i++) {
-    let text = `${pokemonList[i].name} (height: ${pokemonList[i].height})${pokemonList[i].height > 10 ? " - Wow, that's big!" : ""}<br />`;
+
+pokemonList.forEach((pokemon) => {
+    let text = `${pokemon.name} (height: ${pokemon.height})${pokemon.height > 10 ? " - Wow, that's big!" : ""}<br />`;
     document.write(text);
-}
+});
