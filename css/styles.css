@@ -1,0 +1,33 @@
+ul.pokemon-list {
+    list-style-type: none;
+    margin: 0 1em;
+    padding: 0;
+    max-width: 200px;
+}
+
+ul.pokemon-list li, button.pokemon-button {
+    height: 3em;
+}
+
+ul.pokemon-list li {
+    margin: 1em 0;
+}
+
+button.pokemon-button {
+    background-color: #e0e0e0;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+    width: 100%;
+    white-space: nowrap;
+}
+
+button.pokemon-button:hover {
+  background-color: #ea8179;
+}
