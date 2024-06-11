@@ -8,17 +8,18 @@ const pokemonRepository = (() => {
      */
     class Pokemon {
         /**
-         * 
          * @param {string} name The name of the Pokemon
          * @param {string} imageLink A URL that points to an image of the Pokemon
          * @param {*} height The height of the Pokemon
          * @param {*} types The types of the Pokemon
+         * @param {*} url The URL that points to the data of the Pokemon
          */
-        constructor(name, imageLink, height, types) {
+        constructor(name, imageLink, height, types, url) {
             this.name = name;
             this.imageLink = imageLink;
             this.height = height;
             this.types = types;
+            this.url = url;
         }
     }
 
@@ -32,8 +33,11 @@ const pokemonRepository = (() => {
      * @param {Pokemon} pokemon The Pokemon object to be added to the pokemon repository.
      */
     function add(pokemon) {
-        /*I think instanceof has the same functionality as typeof === 'object' and iterating over Object.keys()*/
-        pokemon instanceof Pokemon ? _pokemonList.push(pokemon) : console.error("You can only add objects of the Pokemon class");
+        if (pokemon instanceof Pokemon) {
+            _pokemonList.push(pokemon);
+        } else {
+            throw new Error("You can only add objects of the Pokemon class");
+        }
     }
 
     /**
@@ -45,8 +49,7 @@ const pokemonRepository = (() => {
         if (typeof pokemonName === "string") {
             return _pokemonList.filter((pokemon) => pokemon.name === pokemonName);
         } else {
-            console.error("The name of the Pokemon must be a string");
-            return null;
+            throw new Error("The name of the Pokemon must be a string");
         }
     }
 
@@ -65,58 +68,70 @@ const pokemonRepository = (() => {
             listItem.appendChild(button);
             pokemonList.appendChild(listItem);
         } else {
-            console.error("You can only add objects of the Pokemon class");
+            throw new Error("You can only add objects of the Pokemon class");
         }
     }
 
     /**
-     * This function shows the details of a Pokemon object.
+     * This function logs the details of a Pokemon object.
      * @param {*} pokemon The Pokemon object whose details are to be shown.
      */
     function showDetails(pokemon) {
-        console.log(pokemon);
-    }
-    /**
-     * A helper function that fetches URLs for all pokemon from the pokeapi.co API.
-     * @returns {Promise<Array<string>>} An array of URLs that point to the data of all pokemon in the pokeapi.co API.
-     */
-    async function _getPokemonURLs() {
-        const urlList = [];
-        let response = await fetch(new Request("https://pokeapi.co/api/v2/pokemon?limit=1302&offset=0"));
-        if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
-        } else {
-            response = await response.json();
-            response.results.forEach((pokemon) => {
-                urlList.push(pokemon.url);
+        if (pokemon instanceof Pokemon) {
+            loadDetails(pokemon).then(() => {
+                console.log(pokemon);
             });
+        } else {
+            throw new Error("You can only show details for objects of the Pokemon class");
         }
-        return urlList;
     }
 
     /**
-     * Fetches data for all pokemon from the Pokemon API and adds them to the pokemon repository.
+     * This function fetches a list of all Pokemon from the pokeapi.co API and adds their names and URLs to the pokemon repository.
+     * @returns a promise that resolves to the data fetched from the pokeapi.co API
      */
-    async function getAll() {
-        /* Wait until the array that contains URLs for all pokemon is ready, then send a HTTP request to every URL. */
-        (await _getPokemonURLs()).map(async (url) => await fetch(url)).forEach((httpRequest) => {
-            /* Wait until the HTTP response for a requested URL is ready.*/
-            httpRequest.then(async (httpResponse) => {
-                /* Convert the HTTP Response to JSON data.*/
-                const pokemonJSON = await httpResponse.json();
-                /*Create a new Pokemon object with the JSON data. */
-                const pokemon = new Pokemon(
-                    pokemonJSON.name,
-                    pokemonJSON.sprites.front_default,
-                    pokemonJSON.height,
-                    pokemonJSON.types.map((type) => type.type.name)
-                );
-                /* Add the Pokemon object to the pokemon repository. */
-                add(pokemon);
-                /* Add the Pokemon object to the list of Pokemon objects in the DOM. */
-                addListItem(pokemon);
+    async function loadList() {
+        return fetch(new Request("https://pokeapi.co/api/v2/pokemon?limit=1302&offset=0")).then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+        }).then((data) => {
+            data.results.forEach((pokemonData) => {
+                add(new Pokemon(pokemonData.name, null, null, null, pokemonData.url));
             });
+            return data;
         });
+    }
+
+    /**
+     * This function requests details for a Pokemon object from the pokeapi.co API and then stores the details in the pokemon repository.
+     * @param {Pokemon} pokemon 
+     * @returns a promise that resolves to the pokemon object with the details loaded
+     */
+    async function loadDetails(pokemon) {
+        if (!(pokemon instanceof Pokemon)) {
+            throw new Error("You can only fetch details for objects of the Pokemon class");
+        }
+        return fetch(new Request(pokemon.url)).then((response) => {
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+        }).then((data) => {
+            pokemon.imageLink = data.sprites.front_default;
+            pokemon.height = data.height;
+            pokemon.types = data.types.map((type) => type.type.name);
+            return pokemon;
+        });
+    }
+
+    /**
+     * 
+     * @returns an array of all pokemon
+     */
+    function getAll() {
+        return _pokemonList;
     }
 
     /* Return the pokemon repositories public stuff. */
@@ -126,8 +141,14 @@ const pokemonRepository = (() => {
         getAll: getAll,
         searchByName: searchByName,
         addListItem: addListItem,
-        showDetails: showDetails
+        showDetails: showDetails,
+        loadList: loadList,
+        loadDetails: loadDetails
     };
 })();
 
-pokemonRepository.getAll();
+pokemonRepository.loadList().then(() => {
+    pokemonRepository.getAll().forEach((pokemon) => {
+        pokemonRepository.addListItem(pokemon);
+    });
+});
