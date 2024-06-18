@@ -75,7 +75,7 @@ const pokemonRepository = (() => {
     }
 
     /**
-     * This function logs the details of a Pokemon object.
+     * This function opens a modal in the browser window that shows the details of a Pokemon object.
      * @param {*} pokemon The Pokemon object whose details are to be shown.
      */
     function openDetailsModal(pokemon) {
@@ -83,10 +83,12 @@ const pokemonRepository = (() => {
             loadDetails(pokemon).then(() => {
                 _pokemonDialog.innerText = '';
                 /*I need the shitSolutionButton to prevent autofocus on 
-                the close button after the user opened the modal.*/
+                the close button after the user opened the modal, because
+                I think the blue outline that Safari adds to the close button
+                looks ugly.*/
                 let shitSolutionButton = document.createElement('button');
-                shitSolutionButton.setAttribute('width', '0');
-                shitSolutionButton.setAttribute('height', '0');
+                shitSolutionButton.style.width = '0';
+                shitSolutionButton.style.height = '0';
                 shitSolutionButton.style.padding = '0';
                 shitSolutionButton.style.margin = '0';
                 shitSolutionButton.style.border = '0';
