@@ -1,3 +1,8 @@
+body {
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
 ul.pokemon-list {
     list-style-type: none;
     margin: 0 1em;
@@ -21,7 +26,6 @@ button.pokemon-button {
     text-align: center;
     text-decoration: none;
     display: block;
-    font-size: 16px;
     cursor: pointer;
     transition: background-color 0.5s ease;
     width: 100%;
@@ -30,4 +34,37 @@ button.pokemon-button {
 
 button.pokemon-button:hover {
   background-color: #ea8179;
+}
+
+#pokemon-dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#pokemon-dialog>table {
+    width: 100%;
+    text-align: left;
+}
+
+#pokemon-dialog[open] {
+    display: flex;
+    flex: 0 0 100%;
+    flex-flow: column nowrap;
+    align-items: flex-end;
+    border: 0;
+    border-radius: 5px;
+}
+
+#close-info-modal {
+    cursor: pointer;
+    width: 1.5em;
+    height: 1.5em;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    transition: background-color 0.5s ease;
+}
+
+#close-info-modal:hover {
+    background-color: #ea8179;
 }

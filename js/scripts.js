@@ -28,6 +28,8 @@ const pokemonRepository = (() => {
      */
     let _pokemonList = [];
 
+    let _pokemonDialog = document.querySelector("#pokemon-dialog");
+
     /**
      * This function adds a Pokemon object to the pokemon repository.
      * @param {Pokemon} pokemon The Pokemon object to be added to the pokemon repository.
@@ -63,7 +65,7 @@ const pokemonRepository = (() => {
             const listItem = document.createElement("li");
             const button = document.createElement("button");
             button.innerText = pokemon.name;
-            button.addEventListener("click", () => showDetails(pokemon));
+            button.addEventListener("click", () => openDetailsModal(pokemon));
             button.classList.add("pokemon-button");
             listItem.appendChild(button);
             pokemonList.appendChild(listItem);
@@ -76,10 +78,54 @@ const pokemonRepository = (() => {
      * This function logs the details of a Pokemon object.
      * @param {*} pokemon The Pokemon object whose details are to be shown.
      */
-    function showDetails(pokemon) {
+    function openDetailsModal(pokemon) {
         if (pokemon instanceof Pokemon) {
             loadDetails(pokemon).then(() => {
-                console.log(pokemon);
+                _pokemonDialog.innerText = '';
+                /*I need the shitSolutionButton to prevent autofocus on 
+                the close button after the user opened the modal.*/
+                let shitSolutionButton = document.createElement('button');
+                shitSolutionButton.setAttribute('width', '0');
+                shitSolutionButton.setAttribute('height', '0');
+                shitSolutionButton.style.padding = '0';
+                shitSolutionButton.style.margin = '0';
+                shitSolutionButton.style.border = '0';
+                shitSolutionButton.style.outline = '0';
+                _pokemonDialog.appendChild(shitSolutionButton);
+                let closeButton = document.createElement('button');
+                closeButton.setAttribute('aria-label', 'Close');
+                closeButton.innerHTML = '&#10006;';
+                closeButton.id = 'close-info-modal';
+                closeButton.addEventListener('click', () => {
+                    document.body.style.overflow = 'auto';
+                    _pokemonDialog.close();
+                });
+                _pokemonDialog.appendChild(closeButton);
+                let pokemonImage = document.createElement('img');
+                pokemonImage.src = pokemon.imageLink;
+                pokemonImage.alt = pokemon.name;
+                _pokemonDialog.appendChild(pokemonImage);
+                let pokemonTable = document.createElement('table')
+                let pokemonTableHead = document.createElement('thead');
+                let pokemonTableHeadCell = document.createElement('th');
+                pokemonTableHeadCell.innerText = pokemon.name;
+                let pokemonTableHeadRow = document.createElement('tr');
+                pokemonTableHeadRow.appendChild(pokemonTableHeadCell);
+                pokemonTableHead.appendChild(pokemonTableHeadRow);
+                pokemonTable.appendChild(pokemonTableHead);
+                let pokemonTableBody = document.createElement('tbody');
+                let pokemonHeightRow = document.createElement('tr');
+                let pokemonHeightRowName = document.createElement('td');
+                pokemonHeightRowName.innerText = 'Height';
+                let pokemonHeightRowValue = document.createElement('td');
+                pokemonHeightRowValue.innerText = pokemon.height;
+                pokemonHeightRow.appendChild(pokemonHeightRowName);
+                pokemonHeightRow.appendChild(pokemonHeightRowValue);
+                pokemonTableBody.appendChild(pokemonHeightRow);
+                pokemonTable.appendChild(pokemonTableBody);
+                _pokemonDialog.appendChild(pokemonTable);
+                document.body.style.overflow = 'hidden';
+                _pokemonDialog.showModal();
             });
         } else {
             throw new Error("You can only show details for objects of the Pokemon class");
@@ -141,7 +187,8 @@ const pokemonRepository = (() => {
         getAll: getAll,
         searchByName: searchByName,
         addListItem: addListItem,
-        showDetails: showDetails,
+        openDetailsModal: openDetailsModal, //this is the equivalent of the showDetails function from the exercise
+        closeDetailsModal: () => _pokemonDialog.close(),
         loadList: loadList,
         loadDetails: loadDetails
     };
