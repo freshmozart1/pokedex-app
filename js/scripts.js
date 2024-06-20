@@ -80,7 +80,7 @@ jQuery(function () {
         function openDetailsModal(pokemon) {
             if (pokemon instanceof Pokemon) {
                 loadDetails(pokemon).then(() => {
-                    _pokemonDialog.empty();
+                    _pokemonDialog.empty(); //removes all previous content from the Pokemon dialog
                     /*I need the shitSolutionButton to prevent autofocus on 
                     the close button after the user opened the modal, because
                     I think the blue outline that Safari adds to the close button
@@ -93,14 +93,16 @@ jQuery(function () {
                         border: '0',
                         outline: '0'
                     });
-                    let closeButton = $("<button></button>").attr({
-                        'aria-label': 'Close',
-                        id: 'close-info-modal'
-                    }).html('&#10006;');
-                    closeButton.on('click', () => {
-                        $("body").css("overflow", "auto");
-                        closeDetailsModal();
-                    });
+                    let closeButton = $("<button></button>")
+                        .attr({
+                            'aria-label': 'Close',
+                            id: 'close-info-modal'
+                        })
+                        .html('&#10006;')
+                        .on('click', () => {
+                            $("body").css("overflow", "auto");
+                            closeDetailsModal();
+                        });
                     let pokemonImage = $("<img>").attr({
                         src: pokemon.imageLink,
                         alt: pokemon.name
