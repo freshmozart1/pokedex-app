@@ -1,4 +1,4 @@
-$(document).ready(function () {
+jQuery(function () {
     /**
      * This is a module that represents a Pokemon repository.
      */
