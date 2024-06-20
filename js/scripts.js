@@ -105,8 +105,7 @@ jQuery(function () {
                         src: pokemon.imageLink,
                         alt: pokemon.name
                     });
-                    let pokemonTable = $("<table></table>");
-                    pokemonTable.append(
+                    let pokemonTable = $("<table></table>").append(
                         $("<thead></thead>").append($("<tr></tr>")
                             .append($("<th></th>").text(pokemon.name))
                         ),
