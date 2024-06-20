@@ -1,0 +1,13 @@
+{
+    "name": "pokedex-website",
+    "version": "0.0.1",
+    "description": "My project description",
+    "main": "index.html",
+    "scripts": {
+        "server": "python3 -m http.server -b 127.0.0.1 8000",
+        "createDoc": "./node_modules/.bin/jsdoc ./js/scripts.js",
+        "openDoc": "python3 -m http.server -b 127.0.0.1 8000 && open 127.0.0.1:8000/out/index.html"
+    },
+    "author": "Ole Köster",
+    "license": "GPLv3"
+}
