@@ -9,5 +9,8 @@
         "openDoc": "python3 -m http.server -b 127.0.0.1 8000 && open 127.0.0.1:8000/out/index.html"
     },
     "author": "Ole Köster",
-    "license": "GPLv3"
+    "license": "GPLv3",
+    "devDependencies": {
+        "bootstrap": "^5.3.3"
+    }
 }

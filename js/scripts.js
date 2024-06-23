@@ -1,201 +1,78 @@
-jQuery(function () {
+jQuery(() => {
     /**
-     * This is a module that represents a Pokemon repository.
+     * This class represents a Pokemon.
      */
-    const pokemonRepository = (function () {
-
+    class Pokemon {
         /**
-         * A class that represents a Pokemon object.
+         * @param {string} name The name of the Pokemon
+         * @param {string} imageLink A URL that points to an image of the Pokemon
+         * @param {number} height The height of the Pokemon
+         * @param {string[]} types The types of the Pokemon
          */
-        class Pokemon {
-            /**
-             * @param {string} name The name of the Pokemon
-             * @param {string} imageLink A URL that points to an image of the Pokemon
-             * @param {*} height The height of the Pokemon
-             * @param {*} types The types of the Pokemon
-             * @param {*} url The URL that points to the data of the Pokemon
-             */
-            constructor(name, imageLink, height, types, url) {
-                this.name = name;
-                this.imageLink = imageLink;
-                this.height = height;
-                this.types = types;
-                this.url = url;
-            }
+        constructor(name, imageLink, height, types) {
+            this.name = name;
+            this.imageLink = imageLink;
+            this.height = height;
+            this.types = types;
         }
 
         /**
-         * A private array that holds all Pokemon objects.
+         * This method sets the content of the Pokémon modal.
          */
-        let _pokemonList = [];
-        let _pokemonDialog = $("#pokemon-dialog");
-
-        /**
-         * This function adds a Pokemon object to the pokemon repository.
-         * @param {Pokemon} pokemon The Pokemon object to be added to the pokemon repository.
-         */
-        function add(pokemon) {
-            if (pokemon instanceof Pokemon) {
-                _pokemonList.push(pokemon);
-            } else {
-                throw new Error("You can only add objects of the Pokemon class");
-            }
+        #setModalContent() {
+            $('#pokemon_modal div.modal-content').empty().append(
+                $('<div class="modal-header"></div>').append(
+                    '<h5 class="modal-title">' + this.name + '</h5>',
+                    '<button type="button" class="btn btn-close" data-bs-dismiss="modal" aria-label="Close">&#x2715;</button>'
+                ),
+                $('<div class="modal-body"></div>').append(
+                    '<img alt="' + this.name + '" src="' + this.imageLink + '">',
+                    '<p>Height: ' + this.height + '</p>',
+                    '<p>Types: ' + this.types.join(', ') + '</p>'
+                )
+            );
         }
 
         /**
-         * This function searches for a Pokemon object in the pokemon repository by name.
-         * @param {*} pokemonName The name of the Pokemon to search for.
-         * @returns An array of Pokemon objects that have the same name as the one provided in the argument.
+         * This method adds the Pokémon to the DOM.
          */
-        function searchByName(pokemonName) {
-            if (typeof pokemonName === "string") {
-                return _pokemonList.filter((pokemon) => pokemon.name === pokemonName);
-            } else {
-                throw new Error("The name of the Pokemon must be a string");
-            }
+        addToDOM() {
+            const cardButton = $('<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pokemon_modal">' + this.name + '</button>');
+            cardButton.on('click', () => this.#setModalContent());
+            $('#pokemonContainer').append(
+                $('<div class="col pt-3"></div>').append(
+                    $('<div class="card border-0"></div>').append(
+                        $('<img class="card-img" alt="' + this.name + '" src="' + this.imageLink + '">'),
+                        $('<div class="card-body text-center"></div>').append(cardButton)
+                    )
+                )
+            );
         }
+    }
 
-        /**
-         * This function adds a Pokemon object to the list of Pokemon objects in the DOM.
-         * @param {*} pokemon The Pokemon object to be added to the list of Pokemon objects in the DOM.
-         */
-        function addListItem(pokemon) {
-            if (pokemon instanceof Pokemon) {
-                const pokemonList = $(".pokemon-list");
-                const listItem = $("<li></li>");
-                const button = $("<button></button>").text(pokemon.name);
-                button.on("click", () => openDetailsModal(pokemon));
-                button.addClass("pokemon-button");
-                listItem.append(button);
-                pokemonList.append(listItem);
-            } else {
-                throw new Error("You can only add objects of the Pokemon class");
-            }
-        }
-
-        /**
-         * This function opens a modal in the browser window that shows the details of a Pokemon object.
-         * @param {*} pokemon The Pokemon object whose details are to be shown.
-         */
-        function openDetailsModal(pokemon) {
-            if (pokemon instanceof Pokemon) {
-                loadDetails(pokemon).then(() => {
-                    _pokemonDialog.empty(); //removes all previous content from the Pokemon dialog
-                    /*I need the shitSolutionButton to prevent autofocus on 
-                    the close button after the user opened the modal, because
-                    I think the blue outline that Safari adds to the close button
-                    looks ugly.*/
-                    let shitSolutionButton = $("<button></button>").css({
-                        width: '0',
-                        height: '0',
-                        padding: '0',
-                        margin: '0',
-                        border: '0',
-                        outline: '0'
+    // Fetch the data from the API and create Pokémon objects
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=151').then((response1) => {
+        if (!response1.ok) {
+            throw new Error('HTTP error ' + response1.status);
+        } else {
+            response1.json().then((response1Json) => {
+                response1Json.results.forEach((response1Data) => {
+                    fetch(response1Data.url).then((response2) => {
+                        if (!response2.ok) {
+                            throw new Error('HTTP error ' + response2.status);
+                        } else {
+                            response2.json().then((response2Json) => {
+                                (new Pokemon(
+                                    response2Json.name.charAt(0).toUpperCase() + response2Json.name.slice(1),
+                                    response2Json.sprites.other["official-artwork"].front_default,
+                                    response2Json.height,
+                                    response2Json.types.map((type) => type.type.name)
+                                )).addToDOM();
+                            });
+                        }
                     });
-                    let closeButton = $("<button></button>")
-                        .attr({
-                            'aria-label': 'Close',
-                            id: 'close-info-modal'
-                        })
-                        .html('&#10006;')
-                        .on('click', () => {
-                            $("body").css("overflow", "auto");
-                            closeDetailsModal();
-                        });
-                    let pokemonImage = $("<img>").attr({
-                        src: pokemon.imageLink,
-                        alt: pokemon.name
-                    });
-                    let pokemonTable = $("<table></table>").append(
-                        $("<thead></thead>").append($("<tr></tr>")
-                            .append($("<th></th>").text(pokemon.name))
-                        ),
-                        $("<tbody></tbody>").append($("<tr></tr>")
-                            .append($("<td></td>").text('Height'), $("<td></td>").text(pokemon.height))
-                        )
-                    );
-                    _pokemonDialog.append(shitSolutionButton, closeButton, pokemonImage, pokemonTable);
-                    $("body").css("overflow", "hidden");
-                    _pokemonDialog[0].showModal();// [0] is used to access the DOM element from the jQuery object, because showModal is a DOM method
                 });
-            } else {
-                throw new Error("You can only show details for objects of the Pokemon class");
-            }
-        }
-
-        /**
-         * This function closes the modal that shows the details of a Pokemon object.
-         */
-        function closeDetailsModal() {
-            _pokemonDialog[0].close();// [0] is used to access the DOM element from the jQuery object, because close is a DOM method
-        }
-
-        /**
-         * This function fetches a list of all Pokemon from the pokeapi.co API and adds their names and URLs to the pokemon repository.
-         * @returns a promise that resolves to the data fetched from the pokeapi.co API
-         */
-        async function loadList() {
-            return fetch(new Request("https://pokeapi.co/api/v2/pokemon?limit=1302&offset=0")).then((response) => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
-                return response.json();
-            }).then((data) => {
-                data.results.forEach((pokemonData) => {
-                    add(new Pokemon(pokemonData.name, null, null, null, pokemonData.url));
-                });
-                return data;
             });
         }
-
-        /**
-         * This function requests details for a Pokemon object from the pokeapi.co API and then stores the details in the pokemon repository.
-         * @param {Pokemon} pokemon 
-         * @returns a promise that resolves to the pokemon object with the details loaded
-         */
-        async function loadDetails(pokemon) {
-            if (!(pokemon instanceof Pokemon)) {
-                throw new Error("You can only fetch details for objects of the Pokemon class");
-            }
-            return fetch(new Request(pokemon.url)).then((response) => {
-                if (!response.ok) {
-                    throw new Error("HTTP error " + response.status);
-                }
-                return response.json();
-            }).then((data) => {
-                pokemon.imageLink = data.sprites.front_default;
-                pokemon.height = data.height;
-                pokemon.types = data.types.map((type) => type.type.name);
-                return pokemon;
-            });
-        }
-
-        /**
-         * 
-         * @returns an array of all pokemon
-         */
-        function getAll() {
-            return _pokemonList;
-        }
-
-        /* Return the pokemon repositories public stuff. */
-        return {
-            Pokemon: Pokemon,
-            add: add,
-            getAll: getAll,
-            searchByName: searchByName,
-            addListItem: addListItem,
-            openDetailsModal: openDetailsModal, //this is the equivalent of the showDetails function from the exercise
-            closeDetailsModal: closeDetailsModal,
-            loadList: loadList,
-            loadDetails: loadDetails
-        };
-    })();
-
-    pokemonRepository.loadList().then(() => {
-        pokemonRepository.getAll().forEach((pokemon) => {
-            pokemonRepository.addListItem(pokemon);
-        });
     });
 });
