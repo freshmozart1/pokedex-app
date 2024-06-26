@@ -1,0 +1,20 @@
+{
+    "name": "pokedex-website",
+    "version": "0.0.1",
+    "description": "A simple website to display a infos about Pokémons",
+    "main": "index.html",
+    "scripts": {
+        "server": "python3 -m http.server -b 127.0.0.1 8000",
+        "createDoc": "./node_modules/.bin/jsdoc ./js/scripts.js",
+        "openDoc": "python3 -m http.server -b 127.0.0.1 8000 && open 127.0.0.1:8000/out/index.html"
+    },
+    "author": "Ole Köster",
+    "license": "GPLv3",
+    "devDependencies": {
+        "@eslint/js": "^9.5.0",
+        "bootstrap": "^5.3.3",
+        "eslint": "^9.5.0",
+        "globals": "^15.6.0",
+        "stylelint": "^16.6.1"
+    }
+}
