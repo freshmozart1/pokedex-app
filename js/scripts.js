@@ -41,8 +41,8 @@ jQuery(() => {
     addToDOM() {
       const cardButton = $(
         '<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pokemon_modal">' +
-          this.name +
-          "</button>"
+        this.name +
+        "</button>"
       );
       cardButton.on("click", () => this.#setModalContent());
       $("#pokemonContainer").append(
@@ -50,10 +50,10 @@ jQuery(() => {
           $('<div class="card border-0"></div>').append(
             $(
               '<img class="card-img" alt="' +
-                this.name +
-                '" src="' +
-                this.imageLink +
-                '">'
+              this.name +
+              '" src="' +
+              this.imageLink +
+              '">'
             ),
             $('<div class="card-body text-center"></div>').append(cardButton)
           )
@@ -76,7 +76,7 @@ jQuery(() => {
               response2.json().then((response2Json) => {
                 new Pokemon(
                   response2Json.name.charAt(0).toUpperCase() +
-                    response2Json.name.slice(1),
+                  response2Json.name.slice(1),
                   response2Json.sprites.other["official-artwork"].front_default,
                   response2Json.height,
                   response2Json.types.map((type) => type.type.name)
