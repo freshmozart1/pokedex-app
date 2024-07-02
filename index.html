@@ -23,14 +23,19 @@
                     <div class="container-fluid">
                         <a class="navbar-brand text-white" href="index.html">Pokédex</a>
                         <form class="d-flex" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-success" type="submit">&#128269;</button>
+                            <input class="form-control me-2" type="text" placeholder="Search by name"
+                                aria-label="Search" id="searchField" required>
+                            <button class="btn btn-success" type="submit" id="searchButton">&#128269;</button>
+                            <button class="btn btn-success" id="clearSearchButton">&#10060;</button>
                         </form>
                     </div>
                 </nav>
             </div>
         </div>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="pokemonContainer">
+        </div>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4" id="noPokemonsFound">
+            <p></p>
         </div>
         <div class="row row-cols-1">
             <div class="col-12">
@@ -48,7 +53,7 @@
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?version=4.8.0"></script>
-    <script src="js/scripts.min.js"></script>
+    <script src="js/min/scripts.min.js"></script>
 </body>
 
 </html>

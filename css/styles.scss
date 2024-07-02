@@ -49,3 +49,12 @@ div.card {
 div.card-body {
     color: $white;
 }
+
+#clearSearchButton {
+    display: none;
+}
+
+#noPokemonsFound {
+    display: none;
+    color: $white;
+}
